@@ -27,10 +27,6 @@ func NewRegulator(concurrency int) *Regulator {
 
 func (regulator *Regulator) Execute(job func() error) {
 	index := atomic.AddInt32(&regulator.jobIndex, 1)
-	// if error exists, return
-	if regulator.err != nil {
-		return
-	}
 	regulator.sem <- true
 	// if error occurred while waiting for channel to unblock, return
 	if regulator.err != nil {
