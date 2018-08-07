@@ -2,13 +2,6 @@ package regulator
 
 import "sync/atomic"
 
-type Regulator struct {
-	concurrency int
-	sem         chan bool
-	jobIndex    int32
-	err         error
-}
-
 type RegulatorError struct {
 	JobIndex int32
 	Message  string
@@ -16,6 +9,13 @@ type RegulatorError struct {
 
 func (l RegulatorError) Error() string {
 	return l.Message
+}
+
+type Regulator struct {
+	concurrency int
+	sem         chan bool
+	jobIndex    int32
+	err         error
 }
 
 func NewRegulator(concurrency int) *Regulator {
@@ -28,11 +28,12 @@ func NewRegulator(concurrency int) *Regulator {
 func (regulator *Regulator) Execute(job func() error) {
 	index := atomic.AddInt32(&regulator.jobIndex, 1)
 	regulator.sem <- true
+	if regulator.err != nil {
+		<-regulator.sem
+		return
+	}
 	go func(jobIndex int32) {
 		defer func() { <-regulator.sem }()
-		if regulator.err != nil {
-			return
-		}
 		err := job()
 		if err != nil {
 			regulator.err = RegulatorError{JobIndex: jobIndex, Message: err.Error()}
