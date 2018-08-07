@@ -49,7 +49,7 @@ func TestErrorHandling(t *testing.T) {
 	err := r.Wait()
 	regErr := err.(RegulatorError)
 	assert.Equal(t, "ut oh", regErr.Error())
-	assert.True(t, executeCount <= 6, "regulator should have not executed more than 2 go routines")
+	assert.True(t, executeCount <= 6, "regulator should have not executed more than 6 go routines")
 }
 
 func timestamp() int {
