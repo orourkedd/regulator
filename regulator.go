@@ -46,5 +46,6 @@ func (regulator *Regulator) Wait() error {
 	for i := 0; i < cap(regulator.sem); i++ {
 		regulator.sem <- true
 	}
+	close(regulator.sem)
 	return regulator.err
 }
