@@ -18,13 +18,6 @@ type Regulator struct {
 	err         error
 }
 
-func NewRegulator(concurrency int) *Regulator {
-	return &Regulator{
-		concurrency: concurrency,
-		sem:         make(chan bool, concurrency),
-	}
-}
-
 func (regulator *Regulator) Execute(job func() error) {
 	index := atomic.AddInt32(&regulator.jobIndex, 1)
 	regulator.sem <- true
@@ -48,4 +41,11 @@ func (regulator *Regulator) Wait() error {
 	}
 	close(regulator.sem)
 	return regulator.err
+}
+
+func NewRegulator(concurrency int) *Regulator {
+	return &Regulator{
+		concurrency: concurrency,
+		sem:         make(chan bool, concurrency),
+	}
 }
