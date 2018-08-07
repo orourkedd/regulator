@@ -7,8 +7,8 @@ type RegulatorError struct {
 	Message  string
 }
 
-func (l RegulatorError) Error() string {
-	return l.Message
+func (err RegulatorError) Error() string {
+	return err.Message
 }
 
 type Regulator struct {
